@@ -106,7 +106,7 @@ game.States.play = function() {
     };
     this.generatePipes = function() {
         var gap = 150;
-        var difficulty = 100; // difficulty越大越简单
+        var difficulty = 10; // difficulty越大越简单
         var position = 50 + Math.floor((505 - 112 - difficulty - gap) * Math.random());
         var topPipeY = position - 320;
         var bottomPipeY = position + gap;
