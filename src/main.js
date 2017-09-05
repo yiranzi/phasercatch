@@ -171,6 +171,7 @@ game.States.play = function() {
 		this.stopGame();
 		if(show_text) this.showGameOverText();
 	};
+    // 游戏结束显示
     this.showGameOverText = function() {
 		this.scoreText.destroy();
 		game.bestScore = game.bestScore || 0;
@@ -180,15 +181,21 @@ game.States.play = function() {
 		var scoreboard = this.gameOverGroup.create(game.width/2, 70, 'score_board');
 		var currentScoreText = game.add.bitmapText(game.width/2 + 60, 105, 'flappy_font', this.score+'', 20, this.gameOverGroup);
 		var bestScoreText = game.add.bitmapText(game.width/2 + 60, 153, 'flappy_font', game.bestScore+'', 20, this.gameOverGroup);
-    // 提交最佳分数
-    postWithAuth(getUrl('player_best_score'), {score: game.bestScore})
-    console.log(getUrl('player_best_score'));
 
-    // 玩家排行榜
-    getWithAuth(getUrl('player_load_rank')).then(function(rank){
-    console.log(rank);
+    // 提交最佳分数
+    postWithAuth(getUrl('player_best_score'), {score: game.bestScore}).then(function() {
+      // 玩家排行榜
+      getWithAuth(getUrl('player_load_rank')).then(function(rankData){
+        window.sessionStorage.setItem('rankdata', JSON.stringify(rankData))
+
+        for (var i = 0; i < rankData.rankList.length; i++) {
+          console.log('ddd', rankData.rankList[i].headImage);
+          game.load.image('u'+ i, rankData.rankList[i].headImage);
+        }
+      })
     })
-    // 重玩
+
+    // 点击重玩
 		var replayBtn = game.add.button(game.width/2, 210, 'btn', function() {
 
       // 统计
@@ -196,14 +203,23 @@ game.States.play = function() {
 
 			game.state.start('play');
 		}, this, null, null, null, null, this.gameOverGroup);
-    // 排行榜
+
+    // 点击排行榜
     var rankBtn = game.add.button(game.width/2, 310, 'btn', function() {
       console.log('排行榜');
-    });
-    // 关注我们
+      // var rankText = game.add.text(game.world.centerX, game.world.centerY, "0分", { font: "12px Arial", fill: "#fff", align: "center" });
+      // rankText.anchor.set(0.5);
+      // window.rankboard = this.gameOverGroup.create(game.width/2, 200, 'score_board');
+      // rankboard.anchor.setTo(0.5, 0);
+      game.state.start('ranklist');
+
+    }, this, null, null, null, null, this.gameOverGroup);
+
+    // 点击关注我们
     var aboutUsBtn = game.add.button(game.width/2, 380, 'btn', function() {
       console.log('关注我们');
-    });
+      // window.rankboard.destroy();
+    }, this, null, null, null, null, this.gameOverGroup);
 
     let gameOText = this.gameOverGroup.create(57, 114, 'medals');
 		gameOverText.anchor.setTo(0.5, 0);
@@ -238,9 +254,69 @@ game.States.play = function() {
     };
 };
 
+
+game.States.ranklist = function () {
+  this.create = function () {
+    this.bg = game.add.tileSprite(0, 0, game.width, game.height, 'background');
+    var listGroup = game.add.group();
+    // var scoreboard = listGroup.create(game.width/2, 20, 'score_board');
+    // scoreboard.anchor.setTo(0.5, 0);
+    //
+    //
+    var rankText = game.add.text(game.world.centerX, 12, "排行榜", { font: "22px Arial", fill: "#fff", align: "center" });
+    rankText.anchor.setTo(0.5, 0);
+    // console.log('playerImg', playerImg);
+
+    // 设置tabs
+    var style = { font: "16px Courier", fill: "#fff", tabs: 120 };
+    const text = game.add.text(100, 50, "昵称\t得分", style);
+
+    var rankdata = JSON.parse(window.sessionStorage.getItem('rankdata'));
+    console.log('rankdata', rankdata);
+
+    for (let i = 0; i < rankdata.rankList.length; i++) {
+      const currPlayer = rankdata.rankList[i];
+
+      let playerImg = listGroup.create(45, 94 + i * 40, 'u'+ i);
+      playerImg.anchor.set(0.5, 0.5);
+      playerImg.height = 30;
+      playerImg.width = 30;
+
+      const word = currPlayer.nickName + '\t' + currPlayer.score;
+      let text2 = game.add.text(100, 85 + i*40 , word, style);
+    }
+
+    // 点击重玩
+    var replayBtn = game.add.button(game.width/2, game.height- 100, 'btn', function() {
+
+      // 统计
+      gameData.track('快飞-排行榜-重新开始');
+
+      game.state.start('play');
+    }, this, null, null, null, null, this.gameOverGroup);
+
+    replayBtn.anchor.set(0.5, 0.5)
+
+  }
+
+  this.preload = function () {
+    // game.load.image('medals', 'http://wx.qlogo.cn/mmopen/RfcJ51KFmQLGzIy0Qcc6wHLnxicoAia2S7BSCYjEXdoLRHzUPPibQRKvEklBkd2vPpNy6nic5yxhfIlGib4EqqPULOEeeRyvt8RRB/0');
+    var rankData = JSON.parse(window.sessionStorage.getItem('rankdata'));
+    for (var i = 0; i < rankData.rankList.length; i++) {
+      console.log('ddd', rankData.rankList[i].headImage);
+      game.load.image('u'+ i, rankData.rankList[i].headImage || 'assets/medals.png');
+
+    }
+
+  }
+
+
+}
+
 game.state.add('boot', game.States.boot);
 game.state.add('preload', game.States.preload);
 game.state.add('menu', game.States.menu);
 game.state.add('play', game.States.play);
+game.state.add('ranklist', game.States.ranklist);
 
 game.state.start('boot');
