@@ -29,6 +29,7 @@
   },
   "dependencies": {
     "phaser-ce": "^2.8.3",
-    "webfontloader": "^1.6.28"
+    "webfontloader": "^1.6.28",
+    "whatwg-fetch": "^2.0.3"
   }
 }

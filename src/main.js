@@ -1,5 +1,7 @@
-// import gameData from '../util/gameData'
-// import {debug} from '../util/serverConfig'
+import gameData from './js/util/gameData'
+import {debug} from './js/util/serverConfig'
+import {getWithAuth,postWithAuth} from './js/util/ajax'
+import {getUrl} from './js/util/api'
 
 var game = new Phaser.Game(288, 505, Phaser.CANVAS, 'game');
 game.States = {};
@@ -130,6 +132,9 @@ game.States.play = function() {
         this.playTip.destroy();
         game.input.onDown.add(this.fly, this);
         game.time.events.start();
+
+        // 统计
+        gameData.track('快飞-游戏开始');
     };
     this.stopGame = function() {
 		this.bg.stopScroll();
@@ -175,13 +180,37 @@ game.States.play = function() {
 		var scoreboard = this.gameOverGroup.create(game.width/2, 70, 'score_board');
 		var currentScoreText = game.add.bitmapText(game.width/2 + 60, 105, 'flappy_font', this.score+'', 20, this.gameOverGroup);
 		var bestScoreText = game.add.bitmapText(game.width/2 + 60, 153, 'flappy_font', game.bestScore+'', 20, this.gameOverGroup);
+    // 提交最佳分数
+    postWithAuth(getUrl('player_best_score'), {score: game.bestScore})
+    console.log(getUrl('player_best_score'));
+
+    // 玩家排行榜
+    getWithAuth(getUrl('player_load_rank')).then(function(rank){
+    console.log(rank);
+    })
+    // 重玩
 		var replayBtn = game.add.button(game.width/2, 210, 'btn', function() {
+
+      // 统计
+      gameData.track('快飞-重新开始');
+
 			game.state.start('play');
 		}, this, null, null, null, null, this.gameOverGroup);
+    // 排行榜
+    var rankBtn = game.add.button(game.width/2, 310, 'btn', function() {
+      console.log('排行榜');
+    });
+    // 关注我们
+    var aboutUsBtn = game.add.button(game.width/2, 380, 'btn', function() {
+      console.log('关注我们');
+    });
+
     let gameOText = this.gameOverGroup.create(57, 114, 'medals');
 		gameOverText.anchor.setTo(0.5, 0);
 		scoreboard.anchor.setTo(0.5, 0);
-		replayBtn.anchor.setTo(0.5, 0);
+    replayBtn.anchor.setTo(0.5, 0);
+		rankBtn.anchor.setTo(0.5, 0);
+    aboutUsBtn.anchor.setTo(0.5, 0);
 		this.gameOverGroup.y = 30;
 	};
     this.resetPipe = function(topPipeY, bottomPipeY) {

@@ -36,6 +36,45 @@
   <script src="dist/vendor.bundle.js"></script>
   <script src="dist/bundle.js"></script>
 
+  <!--增加微信sdk-->
+  <script src="https://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+
+  <script>
+    /**
+     * 长投网 授权
+     */
+    function changTouAuth() {
+      sessionStorage.setItem('preAppUrl', location.href)
+      var url = location.href.replace(/index\S*$/g, 'wxOauth2.html')
+      location.href = url;
+    }
+
+    /**
+     * 授权
+     */
+    function goToAuthorization() {
+      if (!window.sessionStorage.getItem('wxOauth2')) {
+        // 跳转到 长投网 授权页面
+        changTouAuth()
+      }
+    }
+
+    /**
+     * 启动 app
+     */
+    (function() {
+      const ua = navigator.userAgent.toLowerCase();
+      const isWx = ua.match(/MicroMessenger/i) && ua.match(/MicroMessenger/i)[0] === "micromessenger";
+
+      if (isWx) {
+        var player = window.localStorage.getItem('game-player');
+        // 如果玩家不存在，转去授权
+        if (!player) {
+          changTouAuth()
+        }
+      }
+    }())
+  </script>
 </body>
 
 </html>
