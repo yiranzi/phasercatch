@@ -229,7 +229,7 @@ const initSdkConfig = function () {
       window.wx.ready(function () {
         setTimeout(function () {
           setShareConfigForAll({
-            title: '据说很难的小游戏，超过100关',
+            title: '据说很难的小游戏，不可能超过100关',
             imgUrl: location.href.replace('index.html', 'assets/share.png'),
             desc: '考验你小脑的时候到了'
           })
