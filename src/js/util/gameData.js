@@ -62,6 +62,7 @@ const track = function (eventName, properties = {}) {
     window.dplus.track(eventName, properties, () => {})
   }
 
+  sessionProps = JSON.parse(window.localStorage.getItem('game-player'))
   // ict
   var trackData = Object.assign({}, {userId: '00'}, sessionProps, properties, {eventName})
   //console.log('server', server)

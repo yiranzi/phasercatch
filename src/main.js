@@ -205,8 +205,12 @@ game.States.play = function() {
     // })
 
     // 分享最高分
+      const currScore = game.bestScore || rankdata.score;
+      let per = currScore + parseInt(Math.random() * 5);
+      per = per > 30 ? 99 : per;
+      const des = per < 6 ? '不好意思，我的小脑不怎么发达' : '不好意思，厉害了一点点';
     setShareConfigForAll({
-      title: `本财神得分 ${game.bestScore || rankdata.score}，好像超过了99%的人`,
+      title: `本财神得分 ${currScore}，好像超过了${per}%的人`,
       imgUrl: location.href.replace('index.html', 'assets/share.png'),
       desc: '不好意思，厉害了一点点'
     })
