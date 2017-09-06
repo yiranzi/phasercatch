@@ -141,6 +141,12 @@ game.States.play = function() {
 
         // 统计
         gameData.track('快飞-游戏开始');
+
+      getWithAuth(getUrl('player_load_rank')).then(
+        function(rankData){
+          window.sessionStorage.setItem('rankdata', JSON.stringify(rankData))
+        }
+      )
     };
     this.stopGame = function() {
 		this.bg.stopScroll();
@@ -187,16 +193,17 @@ game.States.play = function() {
 		var gameOverText = this.gameOverGroup.create(game.width/2, 0, 'game_over');
 		var scoreboard = this.gameOverGroup.create(game.width/2, 70, 'score_board');
 		var currentScoreText = game.add.bitmapText(game.width/2 + 60, 105, 'flappy_font', this.score+'', 20, this.gameOverGroup);
-		// var bestScoreText = game.add.bitmapText(game.width/2 + 60, 153, 'flappy_font', game.bestScore+'', 20, this.gameOverGroup);
 
-    // 我的最高分
-    getWithAuth(getUrl('player_load_rank')).then(function(rankData){
-      // window.sessionStorage.setItem('rankdata', JSON.stringify(rankData))
-      var bestScoreText = game.add.bitmapText(game.width/2 + 60, 185, 'flappy_font', rankData.score+'', 20);
-    })
+		var rankdata = JSON.parse(window.sessionStorage.getItem('rankdata'));
+		var bestScoreText = game.add.bitmapText(game.width/2 + 60, 153, 'flappy_font', rankdata.score + '', 20, this.gameOverGroup);
+
+    // // 我的最高分
+    // getWithAuth(getUrl('player_load_rank')).then(function(rankData){
+    //   // window.sessionStorage.setItem('rankdata', JSON.stringify(rankData))
+    //   var bestScoreText = game.add.bitmapText(game.width/2 + 60, 185, 'flappy_font', rankData.score+'', 20);
+    // })
 
     // 分享最高分
-      var rankdata = JSON.parse(window.sessionStorage.getItem('rankdata'));
     setShareConfigForAll({
       title: `本财神得分 ${game.bestScore || rankdata.score}，好像超过了99%的人`,
       imgUrl: location.href.replace('index.html', 'assets/share.png'),
