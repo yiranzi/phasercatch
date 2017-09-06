@@ -316,12 +316,16 @@ game.States.ranklist = function () {
       playerImg.height = 30;
       playerImg.width = 30;
 
-      const word = currPlayer.nickName + '\t' + currPlayer.score;
+      const word = currPlayer.nickName.substr(0,9) + '\t' + currPlayer.score;
       let text2 = game.add.text(100, 85 + i*40 , word, style);
+
+      if (i == 8) {
+        break;
+      }
     }
 
     // 点击重玩
-    var replayBtn = game.add.button(game.width/2, game.height- 100, 'replay_btn', function() {
+    var replayBtn = game.add.button(game.width/2, game.height- 40, 'replay_btn', function() {
 
       // 统计
       gameData.track('快飞-排行榜-重新开始');
@@ -339,9 +343,7 @@ game.States.ranklist = function () {
     for (var i = 0; i < rankData.rankList.length; i++) {
       console.log('ddd', rankData.rankList[i].headImage);
       game.load.image('u'+ i, rankData.rankList[i].headImage || 'assets/medals.png');
-
     }
-
   }
 
 
