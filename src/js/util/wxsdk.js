@@ -229,9 +229,9 @@ const initSdkConfig = function () {
       window.wx.ready(function () {
         setTimeout(function () {
           setShareConfigForAll({
-            title: '财神你别跑，快给我交出赚钱秘籍',
-            imgUrl: location.href.replace('index.html', 'assets/images/share.png'),
-            desc: '我要抓住你，小财财'
+            title: '财神快飞',
+            imgUrl: location.href.replace('index.html', 'assets/share.png'),
+            desc: '考验你的财商的时候到了'
           })
         }, 200)
       })
@@ -244,5 +244,6 @@ const initSdkConfig = function () {
 }
 
 export {
-  initSdkConfig
+  initSdkConfig,
+  setShareConfigForAll
 }

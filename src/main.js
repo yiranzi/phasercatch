@@ -2,7 +2,7 @@ import gameData from './js/util/gameData'
 import {debug} from './js/util/serverConfig'
 import {getWithAuth,postWithAuth} from './js/util/ajax'
 import {getUrl} from './js/util/api'
-import {initSdkConfig} from './js/util/wxsdk'
+import {initSdkConfig, setShareConfigForAll} from './js/util/wxsdk'
 
 initSdkConfig()
 
@@ -46,6 +46,7 @@ game.States.preload = function() {
         game.load.image('ready_text', 'assets/get-ready.png');
         game.load.image('play_tip', 'assets/instructions.png');
         game.load.image('game_over', 'assets/gameover.png');
+        game.load.image('game_share', 'assets/game-share.png');
         game.load.image('score_board', 'assets/scoreboard.png');
         game.load.image('medals', 'assets/medals.png');
     };
@@ -182,10 +183,18 @@ game.States.play = function() {
 		game.bestScore = game.bestScore || 0;
 		if(this.score > game.bestScore) game.bestScore = this.score;
 		this.gameOverGroup = game.add.group();
+    var gameShare = this.gameOverGroup.create(100, 0, 'game_share');
 		var gameOverText = this.gameOverGroup.create(game.width/2, 0, 'game_over');
 		var scoreboard = this.gameOverGroup.create(game.width/2, 70, 'score_board');
 		var currentScoreText = game.add.bitmapText(game.width/2 + 60, 105, 'flappy_font', this.score+'', 20, this.gameOverGroup);
 		var bestScoreText = game.add.bitmapText(game.width/2 + 60, 153, 'flappy_font', game.bestScore+'', 20, this.gameOverGroup);
+
+    // 分享最高分
+    setShareConfigForAll({
+      title: `我能过 ${game.bestScore}关`,
+      imgUrl: location.href.replace('index.html', 'assets/share.png'),
+      desc: '不服来战'
+    })
 
     // 显示二维码
     document.getElementById('QRcode').style.display = 'block'
@@ -215,6 +224,7 @@ game.States.play = function() {
 
     // 点击排行榜
     var rankBtn = game.add.button(game.width/2, 280, 'rank_btn', function() {
+      gameData.track('快飞-排行榜');
       document.getElementById('QRcode').style.display = 'none';
       console.log('排行榜');
       // var rankText = game.add.text(game.world.centerX, game.world.centerY, "0分", { font: "12px Arial", fill: "#fff", align: "center" });
@@ -231,6 +241,7 @@ game.States.play = function() {
     // }, this, null, null, null, null, this.gameOverGroup);
 
     let gameOText = this.gameOverGroup.create(57, 114, 'medals');
+    gameShare.anchor.setTo(0.1, 1);
 		gameOverText.anchor.setTo(0.5, 0);
 		scoreboard.anchor.setTo(0.5, 0);
     replayBtn.anchor.setTo(0.5, 0);
