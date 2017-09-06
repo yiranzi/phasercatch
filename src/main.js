@@ -187,7 +187,13 @@ game.States.play = function() {
 		var gameOverText = this.gameOverGroup.create(game.width/2, 0, 'game_over');
 		var scoreboard = this.gameOverGroup.create(game.width/2, 70, 'score_board');
 		var currentScoreText = game.add.bitmapText(game.width/2 + 60, 105, 'flappy_font', this.score+'', 20, this.gameOverGroup);
-		var bestScoreText = game.add.bitmapText(game.width/2 + 60, 153, 'flappy_font', game.bestScore+'', 20, this.gameOverGroup);
+		// var bestScoreText = game.add.bitmapText(game.width/2 + 60, 153, 'flappy_font', game.bestScore+'', 20, this.gameOverGroup);
+
+    // 我的最高分
+    getWithAuth(getUrl('player_load_rank')).then(function(rankData){
+      // window.sessionStorage.setItem('rankdata', JSON.stringify(rankData))
+      var bestScoreText = game.add.bitmapText(game.width/2 + 60, 185, 'flappy_font', rankData.score+'', 20);
+    })
 
     // 分享最高分
     setShareConfigForAll({
