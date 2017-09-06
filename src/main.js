@@ -31,6 +31,7 @@ game.States.preload = function() {
         var preloadSprite = game.add.sprite(34, game.height/2, 'loading');
         game.load.setPreloadSprite(preloadSprite);
         game.load.image('background', 'assets/background.png');
+        game.load.image('rank_background', 'assets/rank-background.png');
         game.load.image('ground', 'assets/ground.png');
         game.load.image('title', 'assets/title.png');
         game.load.spritesheet('bird', 'assets/bird.png', 34, 24, 3);
@@ -291,7 +292,7 @@ game.States.play = function() {
 
 game.States.ranklist = function () {
   this.create = function () {
-    this.bg = game.add.tileSprite(0, 0, game.width, game.height, 'background');
+    this.bg = game.add.tileSprite(0, 0, game.width, game.height, 'rank_background');
     var listGroup = game.add.group();
     // var scoreboard = listGroup.create(game.width/2, 20, 'score_board');
     // scoreboard.anchor.setTo(0.5, 0);
