@@ -198,9 +198,9 @@ game.States.play = function() {
     // 分享最高分
       var rankdata = JSON.parse(window.sessionStorage.getItem('rankdata'));
     setShareConfigForAll({
-      title: `本财神得分 ${game.bestScore || rankdata.score}，稍稍超过99%的人`,
+      title: `本财神得分 ${game.bestScore || rankdata.score}，好像超过了99%的人`,
       imgUrl: location.href.replace('index.html', 'assets/share.png'),
-      desc: '不好意思，不小心厉害了一点点'
+      desc: '不好意思，厉害了一点点'
     })
 
     // 显示二维码
