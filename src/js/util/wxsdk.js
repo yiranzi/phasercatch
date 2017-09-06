@@ -179,14 +179,14 @@ const shareToWeibo = function (config) {
  * 触发
  */
 const onTrigger  = function () {
-  gamedata.track('开始分享')
+  gamedata.track('快飞-开始分享')
 }
 
 /**
  * 取消
  */
 const onCancel  = function () {
-  gamedata.track('取消分享')
+  gamedata.track('快飞-取消分享')
 }
 
 /**
@@ -194,7 +194,7 @@ const onCancel  = function () {
  */
 const onSuccess  = function () {
   // console.log('分享成功')
-  gamedata.track('分享成功')
+  gamedata.track('快飞-成功分享')
 }
 
 /**
