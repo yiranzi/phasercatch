@@ -2,6 +2,9 @@ import gameData from './js/util/gameData'
 import {debug} from './js/util/serverConfig'
 import {getWithAuth,postWithAuth} from './js/util/ajax'
 import {getUrl} from './js/util/api'
+import {initSdkConfig} from './js/util/wxsdk'
+
+initSdkConfig()
 
 var game = new Phaser.Game(288, 505, Phaser.CANVAS, 'game');
 game.States = {};
@@ -32,6 +35,8 @@ game.States.preload = function() {
         game.load.image('title', 'assets/title.png');
         game.load.spritesheet('bird', 'assets/bird.png', 34, 24, 3);
         game.load.image('btn', 'assets/start-button.png');
+        game.load.image('replay_btn', 'assets/replay-button.png');
+        game.load.image('rank_btn', 'assets/rank-button.png');
         game.load.spritesheet('pipe', 'assets/pipes.png', 54, 320, 2);
         game.load.bitmapFont('flappy_font', 'assets/fonts/flappyfont/flappyfont.png', 'assets/fonts/flappyfont/flappyfont.fnt');
         game.load.audio('fly_sound', 'assets/flap.wav');
@@ -182,6 +187,9 @@ game.States.play = function() {
 		var currentScoreText = game.add.bitmapText(game.width/2 + 60, 105, 'flappy_font', this.score+'', 20, this.gameOverGroup);
 		var bestScoreText = game.add.bitmapText(game.width/2 + 60, 153, 'flappy_font', game.bestScore+'', 20, this.gameOverGroup);
 
+    // 显示二维码
+    document.getElementById('QRcode').style.display = 'block'
+
     // 提交最佳分数
     postWithAuth(getUrl('player_best_score'), {score: game.bestScore}).then(function() {
       // 玩家排行榜
@@ -196,16 +204,18 @@ game.States.play = function() {
     })
 
     // 点击重玩
-		var replayBtn = game.add.button(game.width/2, 210, 'btn', function() {
+		var replayBtn = game.add.button(game.width/2, 210, 'replay_btn', function() {
 
       // 统计
       gameData.track('快飞-重新开始');
+      document.getElementById('QRcode').style.display = 'none';
 
 			game.state.start('play');
 		}, this, null, null, null, null, this.gameOverGroup);
 
     // 点击排行榜
-    var rankBtn = game.add.button(game.width/2, 310, 'btn', function() {
+    var rankBtn = game.add.button(game.width/2, 280, 'rank_btn', function() {
+      document.getElementById('QRcode').style.display = 'none';
       console.log('排行榜');
       // var rankText = game.add.text(game.world.centerX, game.world.centerY, "0分", { font: "12px Arial", fill: "#fff", align: "center" });
       // rankText.anchor.set(0.5);
@@ -216,17 +226,16 @@ game.States.play = function() {
     }, this, null, null, null, null, this.gameOverGroup);
 
     // 点击关注我们
-    var aboutUsBtn = game.add.button(game.width/2, 380, 'btn', function() {
-      console.log('关注我们');
-      // window.rankboard.destroy();
-    }, this, null, null, null, null, this.gameOverGroup);
+    // var aboutUsBtn = game.add.button(game.width/2, 380, 'btn', function() {
+    //   console.log('关注我们');
+    // }, this, null, null, null, null, this.gameOverGroup);
 
     let gameOText = this.gameOverGroup.create(57, 114, 'medals');
 		gameOverText.anchor.setTo(0.5, 0);
 		scoreboard.anchor.setTo(0.5, 0);
     replayBtn.anchor.setTo(0.5, 0);
 		rankBtn.anchor.setTo(0.5, 0);
-    aboutUsBtn.anchor.setTo(0.5, 0);
+    // aboutUsBtn.anchor.setTo(0.5, 0);
 		this.gameOverGroup.y = 30;
 	};
     this.resetPipe = function(topPipeY, bottomPipeY) {
@@ -287,7 +296,7 @@ game.States.ranklist = function () {
     }
 
     // 点击重玩
-    var replayBtn = game.add.button(game.width/2, game.height- 100, 'btn', function() {
+    var replayBtn = game.add.button(game.width/2, game.height- 100, 'replay_btn', function() {
 
       // 统计
       gameData.track('快飞-排行榜-重新开始');
