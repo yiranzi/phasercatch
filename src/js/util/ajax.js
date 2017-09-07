@@ -3,7 +3,7 @@
  */
 
 import 'whatwg-fetch'
-import {SEVER_URL, API_TOKEN, CONTENT_TYPE} from './serverConfig'
+import {SEVER_URL, API_TOKEN, CONTENT_TYPE, DEFAULT_ID} from './serverConfig'
 
 /**
  * get方法, 必须授权
@@ -13,7 +13,7 @@ import {SEVER_URL, API_TOKEN, CONTENT_TYPE} from './serverConfig'
 const getWithAuth = function (url) {
   return new Promise((resolve, reject) => {
     // 获得userID
-    const user = JSON.parse(localStorage.getItem('game-player')) ? JSON.parse(localStorage.getItem('game-player')) : {"userId":"0ab7410fabb44200b3e42378a15d6af1"}
+    const user = JSON.parse(localStorage.getItem('game-player')) ? JSON.parse(localStorage.getItem('game-player')) : {'userId':DEFAULT_ID}
     if (!user) {
       reject('用户没有权限')
       return
@@ -71,7 +71,7 @@ const postWithAuth = function (url, data={}) {
   return new Promise((resolve, reject) => {
     // const user = JSON.parse(localStorage.getItem('game-player')) || {userId: '0'}
     //获得 userID
-    const user = JSON.parse(localStorage.getItem('game-player')) ? JSON.parse(localStorage.getItem('game-player')) : {"userId":"0ab7410fabb44200b3e42378a15d6af1"}
+    const user = JSON.parse(localStorage.getItem('game-player')) ? JSON.parse(localStorage.getItem('game-player')) : {'userId':DEFAULT_ID}
     if (!user) {
       reject('用户没有权限')
       return

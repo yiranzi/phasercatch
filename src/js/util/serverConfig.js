@@ -28,6 +28,9 @@ let MSITE_URL = ''
 
 let ZHOULE_APPID = ''
 
+let DEFAULT_ID = ''
+
+
 if (debug) {
   /**
    * 开发环境
@@ -49,6 +52,8 @@ if (debug) {
   MSITE_URL = window.location.href.split('index.html')[0]
 
   ZHOULE_APPID = ''
+
+  DEFAULT_ID = '0ab7410fabb44200b3e42378a15d6af1'
 }
 
 else
@@ -73,6 +78,8 @@ else
   PROJECT = 'hgame'
 
   MSITE_URL = window.location.href.split('index.html')[0]
+
+  DEFAULT_ID = '854b09a048d04b7ca360528712133476'
 }
 
 export {
@@ -85,5 +92,6 @@ export {
   WX_APPID,
   ZHOULE_APPID,
   PROJECT,
-  MSITE_URL
+  MSITE_URL,
+  DEFAULT_ID
 }
