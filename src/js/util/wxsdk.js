@@ -195,6 +195,7 @@ const onCancel  = function () {
 const onSuccess  = function () {
   // console.log('分享成功')
   gamedata.track('快飞-成功分享')
+  window.sessionStorage.setItem('isShared', true)
 }
 
 /**

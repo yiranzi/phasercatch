@@ -3,7 +3,7 @@ import {debug} from './js/util/serverConfig'
 import {getWithAuth,postWithAuth} from './js/util/ajax'
 import {getUrl} from './js/util/api'
 import {initSdkConfig, setShareConfigForAll} from './js/util/wxsdk'
-import Utils from './js/util/utils'
+import {getQueryString} from './js/util/utils'
 
 initSdkConfig()
 
@@ -105,6 +105,11 @@ game.States.play = function() {
         game.time.events.loop(900, this.generatePipes, this);
         game.time.events.stop(false);
         game.input.onDown.addOnce(this.startGame, this);
+        // 难度显示
+        if (window.sessionStorage.getItem('isShared')) {
+          var rankText = game.add.text(30, 12, "简单模式", { font: "12px Arial", fill: "#fff", align: "center" });
+          rankText.anchor.setTo(0.5, 0);
+        }
     };
     this.update = function() {
         if(!this.hasStarted) return;
@@ -117,6 +122,7 @@ game.States.play = function() {
     this.generatePipes = function() {
         var gap = 150;
         var difficulty = 10; // difficulty越大越简单
+        difficulty = window.sessionStorage.getItem('isShared') ? 100 : 10;
         var position = 50 + Math.floor((505 - 112 - difficulty - gap) * Math.random());
         var topPipeY = position - 320;
         var bottomPipeY = position + gap;
@@ -128,6 +134,7 @@ game.States.play = function() {
         this.pipeGroup.setAll('body.velocity.x', -this.gameSpeed);
     };
     this.startGame = function() {
+        // game.time.events.loop(900, this.generatePipes, this);
         this.gameSpeed = 200;
         this.gameIsOver = false;
         this.hasHitGround = false;
@@ -142,7 +149,7 @@ game.States.play = function() {
         game.time.events.start();
 
         // 统计
-        gameData.track('快飞-游戏开始', {'friend': Utils.getQueryString('friendid') || '0'});
+        gameData.track('快飞-游戏开始', {'friend': getQueryString('friendid') || '0'});
 
       getWithAuth(getUrl('player_load_rank')).then(
         function(rankData){
