@@ -3,6 +3,7 @@ import {debug} from './js/util/serverConfig'
 import {getWithAuth,postWithAuth} from './js/util/ajax'
 import {getUrl} from './js/util/api'
 import {initSdkConfig, setShareConfigForAll} from './js/util/wxsdk'
+import Utils from './js/util/utils'
 
 initSdkConfig()
 
@@ -141,7 +142,7 @@ game.States.play = function() {
         game.time.events.start();
 
         // 统计
-        gameData.track('快飞-游戏开始');
+        gameData.track('快飞-游戏开始', {'friend': Utils.getQueryString('friendid') || '0'});
 
       getWithAuth(getUrl('player_load_rank')).then(
         function(rankData){
@@ -206,13 +207,14 @@ game.States.play = function() {
 
     // 分享最高分
       const currScore = game.bestScore || rankdata.score;
-      let per = currScore + parseInt(Math.random() * 5);
+      let per = currScore + parseInt(Math.random() * 15);
       per = per > 30 ? 99 : per;
       const des = per < 6 ? '不好意思，我的小脑不怎么发达' : '不好意思，厉害了一点点';
     setShareConfigForAll({
       title: `本财神得分 ${currScore}，好像超过了${per}%的人`,
       imgUrl: location.href.replace('index.html', 'assets/share.png'),
-      desc: '不好意思，厉害了一点点'
+      desc: des,
+      link: `${window.location.href}?friendid=${JSON.parse(localStorage.getItem('game-player')) ? JSON.parse(localStorage.getItem('game-player')).userId : ''}`
     })
 
     // 显示二维码

@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>小游戏</title>
+</head>
+
+<body>
+  <div style="position:absolute;top:40%;left:50%">
+    <!-- <img src="static/image/loading.gif" style="position:relative;right:50%;width:200px; height:200px;"> -->
+  </div>
+
+  <!-- <script src="static/lib/jquery.min.js" type="text/javascript"></script> -->
+  <script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+
+  <script>
+    /**
+     * 拉取微信主动授权
+     */
+
+    var debug = window.location.href.match('test')
+    var production = !debug
+
+    var server = production ? 'https://ict48.ichangtou.com' : 'https://ict48test.ichangtou.com';
+    var appid = production ? 'wx40fe59ebb6d8a53f' : 'wx7cf8dd5d80048e42';
+    // console.log('production', production);
+    // console.log('server', server);
+    var headers = {
+      'X-iChangTou-Json-Api-Token': production ? 'DE:_:w2qlJFV@ccOeiq41ENp><ETXh3o@aX8M<[_QOsZ<d8[Yz:NIMcKwpjtBk0e' : 'XX:_:w2qlJFV@ccOeiq41ENp><ETXh3o@aX8M<[_QOsZ<d8[Yz:NIMcKwpjtBk0e',
+      'Content-Type': 'application/json; charset=utf-8'
+    };
+
+
+    $(document).ready(function() {
+      if (window.location.href.indexOf('code=') > -1) {
+        //处理code state
+        var raw = window.location.search.split('code=')[1];
+        var code = raw.split('&')[0];
+        var state = window.location.search.split('state=')[1];
+
+        //向服务器发送code
+        sendWxCode(code, state);
+      } else {
+        goToOauth2();
+      }
+    });
+
+
+    /**
+     * 发送code
+     * @param code
+     */
+    function sendWxCode(code, state) {
+      var data = JSON.stringify({
+        code: code
+      });
+      //M站微信授权获取用户信息
+      // var url = server + '/wx/msite/authorization/user-info';
+
+      //万物增长
+      var url = server + '/wx/h5/wwzz/authorization/user-info';
+
+      $.ajax({
+        url: url,
+        headers: headers,
+        data: data,
+        type: 'post',
+        dataType: 'json',
+        success: function(wxAccount) {
+          console.log('wxAccount', wxAccount);
+          //删除重试缓存
+          window.sessionStorage.removeItem('cache-reoauth-num');
+
+          if (wxAccount.openId) {
+            // 设置微信授权信息到缓存
+            window.localStorage.setItem('game-player', JSON.stringify(wxAccount));
+            // production ? goToZouLe() : goToApp()
+            goToApp()
+          } else if (wxAccount.up === '_sys_now') {
+            // 提醒正在升级
+            alert('后台服务正在升级中..请稍后再试')
+          }
+        },
+        error: function() {
+          //授权失败，重复授权动作
+          var failtime = window.sessionStorage.getItem('cache-reoauth-num') || '0';
+
+          if (parseInt(failtime) == 3) {
+            //删除重试缓存
+            window.sessionStorage.removeItem('cache-reoauth-num');
+            //跳转回到App
+            //                        goToApp();
+            alert('抱歉, 网络开小差了, 点击重试');
+            goToOauth2();
+          } else {
+            window.sessionStorage.setItem('cache-reoauth-num', (parseInt(failtime) + 1) + '');
+            goToOauth2();
+          }
+        }
+      });
+    }
+
+    /**
+     * 跳转至宙乐授权
+     */
+    function goToZouLe() {
+      location.href = location.href.replace(/wxOauth2\S*$/g, 'zhouLe.html');
+    }
+
+    /**
+     * 跳转至APP
+     */
+    function goToApp() {
+      var appUrl = window.sessionStorage.getItem('preAppUrl');
+      window.sessionStorage.removeItem('preAppUrl');
+      // console.log('GG wtsss');
+      // window.alert('GG wtsss')
+      console.log('appUrl', appUrl);
+      window.location.href = appUrl;
+    }
+
+    /**
+     * 进行授权
+     */
+    function goToOauth2() {
+      var url = location.href.split('?')[0];
+      window.location.href = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=' +
+        appid + '&redirect_uri=' +
+        encodeURIComponent(url) +
+        '&response_type=code&scope=snsapi_userinfo&state=mapp' + '#wechat_redirect';
+    }
+  </script>
+</body>
+
+</html>
