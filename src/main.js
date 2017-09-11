@@ -263,6 +263,11 @@ game.States.play = function() {
 
     }, this, null, null, null, null, this.gameOverGroup);
 
+    // 点击更多游戏
+    var moreBtn = game.add.button(game.width/2, 350, 'rank_btn', function() {
+
+    }, this, null, null, null, null, this.gameOverGroup);
+
     // 点击关注我们
     // var aboutUsBtn = game.add.button(game.width/2, 380, 'btn', function() {
     //   console.log('关注我们');
@@ -274,6 +279,7 @@ game.States.play = function() {
 		scoreboard.anchor.setTo(0.5, 0);
     replayBtn.anchor.setTo(0.5, 0);
 		rankBtn.anchor.setTo(0.5, 0);
+    moreBtn.anchor.setTo(0.5, 0);
     // aboutUsBtn.anchor.setTo(0.5, 0);
 		this.gameOverGroup.y = 30;
 	};
