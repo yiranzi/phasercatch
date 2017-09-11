@@ -199,7 +199,7 @@ game.States.play = function() {
 		if(this.score > game.bestScore) game.bestScore = this.score;
 		this.gameOverGroup = game.add.group();
     var gameShare = this.gameOverGroup.create(100, 0, 'game_share');
-		var gameOverText = this.gameOverGroup.create(game.width/2, 0, 'game_over');
+		var gameOverText = this.gameOverGroup.create(game.width/2, 20, 'game_over');
 		var scoreboard = this.gameOverGroup.create(game.width/2, 70, 'score_board');
 		var currentScoreText = game.add.bitmapText(game.width/2 + 60, 105, 'flappy_font', this.score+'', 20, this.gameOverGroup);
 
