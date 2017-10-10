@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>鸡年</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta http-equiv="cleartype" content="on">
+
+  <style>
+    * {
+      padding: 0;
+      margin: 0;
+      border: none;
+      user-select: none;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      box-sizing: border-box;
+      -webkit-box-sizing: border-box;
+      -moz-box-sizing: border-box;
+      -ms-box-sizing: border-box;
+    }
+
+    canvas {
+      margin: 0 auto;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="content"></div>
+  <div id="game-box"></div>
+  <div id="QRcode" style="position: absolute;z-index: 99;width: 100%;bottom: 5px;display: none;">
+    <img src="./assets/ercode.png" style="height: 100px; width: 100px;margin:0 auto;display: block">
+    <p style="text-align: center;color: white;">长按关注我们</p>
+  </div>
+
+  <script src="dist/vendor.bundle.js"></script>
+  <script src="dist/bundle.js"></script>
+
+  <!--增加微信sdk-->
+  <script src="https://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+
+  <script>
+    /**
+     * 长投网 授权
+     */
+    function changTouAuth() {
+      sessionStorage.setItem('preAppUrl', location.href)
+      var url = location.href.replace(/index\S*$/g, 'wxOauth2.html')
+      location.href = url;
+    }
+
+    /**
+     * 授权
+     */
+    function goToAuthorization() {
+      if (!window.sessionStorage.getItem('wxOauth2')) {
+        // 跳转到 长投网 授权页面
+        changTouAuth()
+      }
+    }
+
+    /**
+     * 启动 app
+     */
+    (function() {
+      const ua = navigator.userAgent.toLowerCase();
+      const isWx = ua.match(/MicroMessenger/i) && ua.match(/MicroMessenger/i)[0] === "micromessenger";
+
+      if (isWx) {
+        var player = window.localStorage.getItem('game-player');
+        // 如果玩家不存在，转去授权
+        if (!player) {
+          changTouAuth()
+        }
+      }
+    }())
+  </script>
+</body>
+
+</html>

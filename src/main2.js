@@ -24,7 +24,25 @@ $(function () {
   var wudi = false;
   var wudi_timer = 0;
 
-  // 天降之物
+  // 0 未领取
+  // 2 已领取 未使用
+  // 1 已领取
+
+  var sale_card_type;
+  if( window.localStorage.getItem('getCard') ) {
+    sale_card_type = window.localStorage.getItem('getCard');
+  } else {
+    sale_card_type = 0;
+  }
+  var getCardScore = 0;
+  var scorlBool = false;
+
+  var score_normal = 10;
+  var score_mid = 100;
+  var score_max = 100;
+
+
+    // 天降之物
   function Drop(config) {
     this.init = function () {
       this.drops = game.add.group();
@@ -99,8 +117,9 @@ $(function () {
       game.load.image('help', 'assets/images/help.png');
       game.load.image('popup', 'assets/images/popup.png');
       //sun 增加元素
-      game.load.image('comb', 'assets/images/comb.png');
-      game.load.image('comb_3', 'assets/images/comb_3.png');
+      game.load.image('comb', 'assets/images/comb_3.png');
+      game.load.image('comb_3', 'assets/images/comb.png');
+      game.load.image('sale_card', 'assets/images/sale_card.png');
       game.load.spritesheet('boom', 'assets/images/boom.png',75,118);
 
 
@@ -123,7 +142,7 @@ $(function () {
           }, 800, null, true);
           setTimeout(function () {
             game.state.start('main');
-          }, 1500);
+          }, 0);
         }, this);
       });
     }
@@ -140,7 +159,7 @@ $(function () {
         clickbgm.play();
         setTimeout(function () {
           game.state.start('game');
-        }, 1000);
+        }, 0);
       };
       this.closeHelp = function () {
         this.helpPopup.visible = false;
@@ -167,7 +186,7 @@ $(function () {
       this.startGame.height = 311 / unit;
       // 音乐控制
       bgm = game.add.sound('bgm', 0.5, true);
-      bgm.play();
+      // bgm.play();
       this.voiceBtn = game.add.sprite(923 / unit, 45 / unit, 'voice', 1);
       this.voiceBtn.width = 105 / unit;
       this.voiceBtn.height = 105 / unit;
@@ -181,7 +200,7 @@ $(function () {
       this.bang.animations.add('run', runArr);
       this.bang.animations.play('run', 20, true);
       //鸡冠
-      this.comb1 = game.add.sprite(138 / unit, 1428 / unit, 'comb');
+      this.comb1 = game.add.sprite(138 / unit, 1428 / unit, 'comb_3');
       this.comb1.width = 137 / unit;
       this.comb1.height = 157 / unit;
       this.comb1.rotation = 1.5 * Math.PI;
@@ -192,7 +211,7 @@ $(function () {
         top: 1350 / unit
       }, 500, Phaser.Easing.Quadratic.InOut, true, 0, Number.MAX_VALUE, true);
 
-      this.comb2 = game.add.sprite(825 / unit, 1347 / unit, 'comb');
+      this.comb2 = game.add.sprite(825 / unit, 1347 / unit, 'comb_3');
       this.comb2.width = 137 / unit;
       this.comb2.height = 157 / unit;
       var updown2 = this.add.tween(this.comb2);
@@ -213,19 +232,55 @@ $(function () {
 
     };
   };
+
+  game.States.getReward = function () {
+    this.create = function () {
+
+    }
+  }
+
+  //判断优惠券
+  var checkCollider = function (playerObj, fallObj, ground) {
+    console.log('checkCollider')
+    game.physics.arcade.overlap(playerObj, fallObj, getCard.bind(fallObj,playerObj), null, this);
+    game.physics.arcade.collide(ground, fallObj);
+  }
+
+  //得到优惠券
+  var getCard = function (fallObj,playerObj) {
+    // fallObj.kill();
+    // playerObj.kill();
+  }
+
+
+  //sun
   game.States.gameState = function () {
     this.create = function () {
       game.physics.startSystem(Phaser.Physics.ARCADE);
+
       // 背景
       this.bg = game.add.sprite(0, 0, 'loadbg');
       this.bg.width = _width;
       this.bg.height = _height + dheight;
+
+      //优惠券
+      //添加
+      this.sale_card = game.add.sprite(game.world.centerX, game.height - 2000 / unit, 'sale_card');
+      game.physics.arcade.enable(this.sale_card);
+      // this.sale_card.body.gravity.y = 300;
+
+      this.sale_card.anchor.set(0.5, 1);
+      this.sale_card.width = 260 / unit;
+      this.sale_card.height = 440 / unit;
+      this.sale_card.visible = false;
+
       // 地面
       this.ground = game.add.sprite(0, game.height, 'ground');
       this.ground.anchor.set(0, 1);
       this.ground.width = game.width;
       this.ground.height = 195 / unit;
       game.physics.arcade.enable(this.ground);
+      this.ground.body.immovable = true;
       //鼹鼠
       this.bang = game.add.sprite(game.world.centerX, game.height - 178 / unit, 'allbang');
       this.bang.anchor.set(0.5, 1);
@@ -272,10 +327,13 @@ $(function () {
 
       //游戏结束弹窗
       this.overPopup = game.add.group();
+
+
       this.overBox = game.add.image(46 / unit, 321 / unit, 'overbox');
       this.overBox.width = 989 / unit;
       this.overBox.height = 1068 / unit;
       this.overPopup.add(this.overBox);
+
       this.overscore = game.add.retroFont('overscore', 32, 62, "0123456789", 10, 0, 0);
       this.overnum = game.add.image(603 / unit, 564 / unit, this.overscore);
       this.overnum.scale.set(1 / unit);
@@ -283,12 +341,16 @@ $(function () {
       this.againBtn = game.add.button(315 / unit, 695 / unit, 'again', function () {
         this.losebgm.stop();
         clickbgm.play();
+        this.resetData();
         setTimeout(function () {
+          console.log('restart')
+
+
           game.state.start('game');
           if (!game.musicPause) {
             bgm.play();
           }
-        }, 1000);
+        }, 0);
       }, this);
       this.againBtn.width = 477 / unit;
       this.againBtn.height = 163 / unit;
@@ -301,7 +363,16 @@ $(function () {
       this.overPopup.add(this.linkBtn);
       this.overPopup.visible = false;
 
+      //领取优惠券
+      this.overButton = game.add.button(46 / unit, 321 / unit, 'allbang', function () {
+        console.log('123');
+        alert('领取优惠券');
+      });
+      this.overButton.visible = false;
+      this.overPopup.add(this.overButton);
+
     };
+
     this.onStart = function () {
       isStop = false;
       level = 0;
@@ -420,7 +491,7 @@ $(function () {
             // this.bang.animations.play('bangget', 20, false);
             this.getbgm.play();
             this.bang.body.offset.set(40 / unit, 230 / unit);
-            this.scorecount += 1000;
+            this.scorecount += score_normal;
             this.setLevel();
             break;
           case 'comb_3':
@@ -443,7 +514,7 @@ $(function () {
             this.bang.animations.play('banglose2', 16, false);
             this.getbgm.play();
             this.bang.body.offset.set(40 / unit, 230 / unit);
-            this.scorecount += 10000;
+            this.scorecount += score_mid;
             this.setLevel();
             break;
           default:
@@ -454,7 +525,7 @@ $(function () {
               // this.bang.animations.play('bangget', 20, false);
               this.getbgm.play();
               this.bang.body.offset.set(40 / unit, 230 / unit);
-              this.scorecount += 10000;
+              this.scorecount += score_mid;
               this.setLevel();
               break;
             }
@@ -467,7 +538,43 @@ $(function () {
         }
       }
     };
+
+    this.resetData = function () {
+      console.log('resetData')
+      //重置sale_card_type
+      sale_card_type = window.localStorage.getItem('getCard');
+
+      //重置gameover卡片显示
+      this.overButton.visible = false;
+
+      //重置卡片掉落/领取
+      scorlBool = false;
+      this.sale_card.visible = false;
+      this.sale_card.body.gravity.y = 0;
+    }
+
+    this.getCard = function () {
+      //结尾的卡片
+      this.overButton.visible = true;
+      this.sale_card.kill();
+
+      //
+
+    }
     this.update = function () {
+      // checkCollider(this.bang, this.sale_card, this.ground)
+      //checkScore
+      if ( !scorlBool && (this.scorecount > getCardScore) ) {
+        scorlBool = true;
+        console.log('123123123')
+        this.sale_card.visible = true;
+        this.sale_card.body.gravity.y = 50;
+      }
+
+      console.log('checkCollider')
+      game.physics.arcade.overlap(this.bang, this.sale_card, this.getCard, null, this);
+      game.physics.arcade.collide(this.ground, this.sale_card);
+
       //sun 碰撞检测
       this.acomb && game.physics.arcade.overlap(this.acomb.drops, this.bang, this.crashDrops, null, this);
       this.aboom && game.physics.arcade.overlap(this.aboom.drops, this.bang, this.crashDrops, null, this);
@@ -486,6 +593,7 @@ $(function () {
   game.state.add('loader', game.States.loaderState);
   game.state.add('main', game.States.mainState);
   game.state.add('game', game.States.gameState);
+  game.state.add('getReward', game.States.getReward);
 
   game.state.start('boot');
 
